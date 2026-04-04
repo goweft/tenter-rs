@@ -1,0 +1,70 @@
+name: "Tenter Scan"
+description: "Pre-publish artifact integrity scanner. Catches source maps, debug artifacts, secrets, and sensitive files before they ship. Static binary — no Python required."
+author: "goweft"
+
+branding:
+  icon: "shield"
+  color: "blue"
+
+inputs:
+  target:
+    description: "Path to scan (directory, tarball, or wheel)"
+    required: false
+    default: "."
+  format:
+    description: "Output format: human, json, or sarif"
+    required: false
+    default: "sarif"
+  fail-on:
+    description: "Minimum severity to fail: critical, high, medium, low, info"
+    required: false
+    default: "high"
+  version:
+    description: "tenter version to download (default: latest)"
+    required: false
+    default: "2.0.0"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install tenter binary
+      shell: bash
+      run: |
+        VERSION="${{ inputs.version }}"
+        OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+        ARCH=$(uname -m)
+        # Normalise arch names
+        case "$ARCH" in
+          x86_64)  ARCH="x86_64" ;;
+          aarch64|arm64) ARCH="aarch64" ;;
+          *) echo "Unsupported arch: $ARCH" && exit 1 ;;
+        esac
+        BIN="tenter-${OS}-${ARCH}"
+        URL="https://github.com/goweft/tenter-rs/releases/download/v${VERSION}/${BIN}"
+        echo "Downloading $URL"
+        curl -fsSL "$URL" -o /usr/local/bin/tenter
+        chmod +x /usr/local/bin/tenter
+        tenter --version
+
+    - name: Run tenter scan
+      id: scan
+      shell: bash
+      run: |
+        set +e
+        EXT="${{ inputs.format == 'sarif' && 'sarif' || 'txt' }}"
+        tenter scan "${{ inputs.target }}" \
+          --format "${{ inputs.format }}" \
+          --fail-on "${{ inputs.fail-on }}" \
+          > "tenter-results.${EXT}"
+        echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+    - name: Upload SARIF results
+      if: inputs.format == 'sarif' && always()
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: tenter-results.sarif
+      continue-on-error: true
+
+    - name: Check exit code
+      shell: bash
+      run: exit ${{ steps.scan.outputs.exit_code }}

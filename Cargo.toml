@@ -1,0 +1,62 @@
+[package]
+name = "tenter"
+version = "2.0.0"
+edition = "2021"
+authors = ["goweft <goweft@proton.me>"]
+description = "Pre-publish artifact integrity scanner — memory-safe static binary"
+homepage = "https://github.com/goweft/tenter-rs"
+repository = "https://github.com/goweft/tenter-rs"
+license = "MIT"
+keywords = ["security", "npm", "supply-chain", "source-map", "publish"]
+categories = ["command-line-utilities", "development-tools"]
+rust-version = "1.75"
+
+[[bin]]
+name = "tenter"
+path = "src/main.rs"
+
+[dependencies]
+# Regex — DFA/NFA, guaranteed linear time. ReDoS architecturally impossible.
+regex = { version = "1.10", default-features = false, features = ["std", "unicode-case", "unicode-perl"] }
+
+# Glob matching with correct ** semantics — replaces the custom Python _glob_match
+globset = "0.4"
+
+# Archive reading
+tar = "0.4"
+flate2 = { version = "1.0", default-features = false, features = ["rust_backend"] }
+zip = { version = "2.1", default-features = false, features = ["deflate"] }
+
+# JSON — config parsing and output
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# CLI argument parsing
+clap = { version = "4.5", features = ["derive"] }
+
+# Directory walking
+walkdir = "2.5"
+
+# TTY detection for auto-color
+is-terminal = "0.4"
+
+# Error handling
+anyhow = "1.0"
+
+# Temp directories for archive extraction
+tempfile = "3.10"
+
+[dev-dependencies]
+tempfile = "3.10"
+serde_json = "1.0"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[profile.dev]
+opt-level = 0
+debug = true
