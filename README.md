@@ -6,6 +6,10 @@
 
 Identical scanning behaviour to [tenter v1](https://github.com/goweft/tenter) but compiled to a single static binary for use in GitHub Actions without `setup-python`.
 
+## See It Work
+
+<p align="center"><img src="https://raw.githubusercontent.com/goweft/tenter/main/demo.svg" alt="tenter demo" width="100%"></p>
+
 ## Why a Rust port?
 
 | | v1 (Python) | v2 (Rust) |
@@ -19,11 +23,20 @@ Identical scanning behaviour to [tenter v1](https://github.com/goweft/tenter) bu
 ## Installation
 
 ```bash
-# Homebrew (coming soon)
-brew install goweft/tap/tenter
-
-# Direct download (linux x86_64)
+# Linux x86_64
 curl -fsSL https://github.com/goweft/tenter-rs/releases/latest/download/tenter-linux-x86_64 \
+  -o /usr/local/bin/tenter && chmod +x /usr/local/bin/tenter
+
+# Linux arm64
+curl -fsSL https://github.com/goweft/tenter-rs/releases/latest/download/tenter-linux-aarch64 \
+  -o /usr/local/bin/tenter && chmod +x /usr/local/bin/tenter
+
+# macOS Intel
+curl -fsSL https://github.com/goweft/tenter-rs/releases/latest/download/tenter-darwin-x86_64 \
+  -o /usr/local/bin/tenter && chmod +x /usr/local/bin/tenter
+
+# macOS Apple Silicon
+curl -fsSL https://github.com/goweft/tenter-rs/releases/latest/download/tenter-darwin-aarch64 \
   -o /usr/local/bin/tenter && chmod +x /usr/local/bin/tenter
 
 # From source
