@@ -66,7 +66,9 @@ jobs:
         run: |
           BIN="target/${{ matrix.target }}/release/tenter"
           file "$BIN"
-          ldd "$BIN" 2>&1 | grep -q "statically linked" || \
+          # Use file(1) output — ldd is unreliable for cross-compiled aarch64
+          # binaries running on an x86_64 host.
+          file "$BIN" | grep -q "statically linked" || \
             { echo "ERROR: binary is not statically linked"; exit 1; }
 
       - name: Upload binary artifact
