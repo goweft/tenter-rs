@@ -54,13 +54,10 @@ runs:
       shell: bash
       run: |
         set +e
-        if [ "${{ inputs.format }}" = "sarif" ]; then
-          EXT="sarif"
-        else
-          EXT="txt"
-        fi
+        FORMAT="${{ inputs.format }}"
+        if [ "$FORMAT" = "sarif" ]; then EXT="sarif"; else EXT="txt"; fi
         tenter scan "${{ inputs.target }}" \
-          --format "${{ inputs.format }}" \
+          --format "$FORMAT" \
           --fail-on "${{ inputs.fail-on }}" \
           > "tenter-results.${EXT}"
         echo "exit_code=$?" >> "$GITHUB_OUTPUT"
