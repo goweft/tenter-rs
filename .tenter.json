@@ -1,0 +1,10 @@
+{
+  "allowlist": [
+    "target/**",
+    "tests/integration.rs"
+  ],
+  "size_limit_single_file_bytes": 52428800,
+  "size_limit_total_bytes": 209715200,
+  "extra_sensitive_patterns": [],
+  "extra_debug_patterns": []
+}
