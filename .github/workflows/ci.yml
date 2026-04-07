@@ -66,9 +66,10 @@ jobs:
         run: |
           BIN="target/${{ matrix.target }}/release/tenter"
           file "$BIN"
-          # Use file(1) output — ldd is unreliable for cross-compiled aarch64
-          # binaries running on an x86_64 host.
-          file "$BIN" | grep -q "statically linked" || \
+          # Match both "statically linked" (older Rust/file) and
+          # "static-pie linked" (newer Rust with PIE enabled).
+          # Both are fully static — no dynamic linker, no glibc dependency.
+          file "$BIN" | grep -qE "static(ally|-pie) linked" || \
             { echo "ERROR: binary is not statically linked"; exit 1; }
 
       - name: Upload binary artifact
