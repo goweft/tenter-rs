@@ -54,7 +54,11 @@ runs:
       shell: bash
       run: |
         set +e
-        if [ "${{ inputs.format }}" = "sarif" ]; then EXT="sarif"; else EXT="txt"; fi
+        if [ "${{ inputs.format }}" = "sarif" ]; then
+          EXT="sarif"
+        else
+          EXT="txt"
+        fi
         tenter scan "${{ inputs.target }}" \
           --format "${{ inputs.format }}" \
           --fail-on "${{ inputs.fail-on }}" \
@@ -62,7 +66,7 @@ runs:
         echo "exit_code=$?" >> "$GITHUB_OUTPUT"
 
     - name: Upload SARIF results
-      if: inputs.format == 'sarif' && always()
+      if: always() && inputs.format == 'sarif'
       uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: tenter-results.sarif
@@ -70,4 +74,6 @@ runs:
 
     - name: Check exit code
       shell: bash
-      run: exit ${{ steps.scan.outputs.exit_code }}
+      run: |
+        CODE="${{ steps.scan.outputs.exit_code }}"
+        exit "${CODE:-0}"
