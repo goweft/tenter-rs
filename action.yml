@@ -1,5 +1,5 @@
-name: "Tenter Scan"
-description: "Pre-publish artifact integrity scanner. Catches source maps, debug artifacts, secrets, and sensitive files before they ship. Static binary — no Python required."
+name: "Tenter Scan (Rust)"
+description: "Pre-publish artifact integrity scanner — static binary, no Python required. Catches source maps, debug artifacts, secrets, and sensitive files before they ship."
 author: "goweft"
 
 branding:
@@ -20,9 +20,9 @@ inputs:
     required: false
     default: "high"
   version:
-    description: "tenter version to download (default: latest)"
+    description: "tenter-rs version to download (default: latest)"
     required: false
-    default: "2.0.0"
+    default: "latest"
 
 runs:
   using: "composite"
@@ -31,17 +31,20 @@ runs:
       shell: bash
       run: |
         VERSION="${{ inputs.version }}"
+        if [ "$VERSION" = "latest" ]; then
+          VERSION=$(curl -fsSL https://api.github.com/repos/goweft/tenter-rs/releases/latest \
+            | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+        fi
         OS=$(uname -s | tr '[:upper:]' '[:lower:]')
         ARCH=$(uname -m)
-        # Normalise arch names
         case "$ARCH" in
-          x86_64)  ARCH="x86_64" ;;
+          x86_64)        ARCH="x86_64" ;;
           aarch64|arm64) ARCH="aarch64" ;;
           *) echo "Unsupported arch: $ARCH" && exit 1 ;;
         esac
         BIN="tenter-${OS}-${ARCH}"
         URL="https://github.com/goweft/tenter-rs/releases/download/v${VERSION}/${BIN}"
-        echo "Downloading $URL"
+        echo "Downloading tenter v${VERSION} for ${OS}/${ARCH}"
         curl -fsSL "$URL" -o /usr/local/bin/tenter
         chmod +x /usr/local/bin/tenter
         tenter --version
@@ -51,7 +54,7 @@ runs:
       shell: bash
       run: |
         set +e
-        EXT="${{ inputs.format == 'sarif' && 'sarif' || 'txt' }}"
+        if [ "${{ inputs.format }}" = "sarif" ]; then EXT="sarif"; else EXT="txt"; fi
         tenter scan "${{ inputs.target }}" \
           --format "${{ inputs.format }}" \
           --fail-on "${{ inputs.fail-on }}" \
