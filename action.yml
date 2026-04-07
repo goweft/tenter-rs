@@ -1,5 +1,5 @@
 name: "Tenter Scan (Rust)"
-description: "Pre-publish artifact integrity scanner — static binary, no Python required. Catches source maps, debug artifacts, secrets, and sensitive files before they ship."
+description: "Pre-publish artifact integrity scanner. Static binary, no Python required. Catches source maps, secrets, and debug artifacts."
 author: "goweft"
 
 branding:
