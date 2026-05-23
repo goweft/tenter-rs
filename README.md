@@ -1,4 +1,4 @@
-<p align="center"><img src="https://raw.githubusercontent.com/goweft/tenter/main/banner.svg" alt="tenter" width="100%"></p>
+<p align="center"><img src="banner.svg" alt="tenter" width="100%"></p>
 
 # tenter-rs
 
