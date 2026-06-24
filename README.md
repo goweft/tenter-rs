@@ -158,7 +158,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Scan the package before publish
-        uses: goweft/tenter-rs@v2          # or pin: goweft/tenter-rs@v2.1.0
+        uses: goweft/tenter-rs@v2          # or pin: goweft/tenter-rs@v2.0.5
         with:
           target: ./dist                   # directory, .tgz, .whl, or .crate
           format: sarif                     # human | json | sarif  (default: sarif)
@@ -176,7 +176,7 @@ Adopt tenter-rs through the [pre-commit](https://pre-commit.com) framework. The 
 ```yaml
 repos:
   - repo: https://github.com/goweft/tenter-rs
-    rev: v2.1.0
+    rev: v2.0.5
     hooks:
       # Scans exactly what `npm pack` would publish — no node_modules noise.
       - id: tenter
