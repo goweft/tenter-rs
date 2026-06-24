@@ -1,0 +1,30 @@
+# pre-commit hooks for tenter-rs — https://pre-commit.com
+#
+# Usage in a consumer repo's .pre-commit-config.yaml:
+#
+#   repos:
+#     - repo: https://github.com/goweft/tenter-rs
+#       rev: v2.1.0
+#       hooks:
+#         - id: tenter
+#
+# The hook downloads the matching static binary on first run (cached); no Rust
+# toolchain is required. Linux and macOS runners are supported.
+
+- id: tenter
+  name: tenter — scan what npm would publish
+  description: Run `npm pack --dry-run` and scan the file list for secrets, source maps, debug artifacts, sensitive files, and AI-tool cruft.
+  entry: hooks/tenter-precommit.sh
+  language: script
+  pass_filenames: false
+  always_run: true
+  args: ["npm-check", ".", "--no-color", "--fail-on", "critical"]
+
+- id: tenter-scan
+  name: tenter — scan a build directory
+  description: Scan a built artifact directory (override the path in `args`) for secrets, source maps, debug artifacts, sensitive files, and AI-tool cruft.
+  entry: hooks/tenter-precommit.sh
+  language: script
+  pass_filenames: false
+  always_run: true
+  args: ["scan", "./dist", "--no-color", "--fail-on", "critical"]

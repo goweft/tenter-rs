@@ -1,6 +1,6 @@
 [package]
 name = "tenter"
-version = "2.0.0"
+version = "2.1.0"
 edition = "2021"
 authors = ["goweft <goweft@proton.me>"]
 description = "Pre-publish artifact integrity scanner — memory-safe static binary"

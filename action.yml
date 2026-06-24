@@ -30,24 +30,29 @@ runs:
     - name: Install tenter binary
       shell: bash
       run: |
+        set -euo pipefail
         VERSION="${{ inputs.version }}"
         if [ "$VERSION" = "latest" ]; then
           VERSION=$(curl -fsSL https://api.github.com/repos/goweft/tenter-rs/releases/latest \
-            | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+            | grep '"tag_name"' | sed -E 's/.*"v?([^"]+)".*/\1/')
         fi
+        VERSION="${VERSION#v}"
         OS=$(uname -s | tr '[:upper:]' '[:lower:]')
         ARCH=$(uname -m)
         case "$ARCH" in
-          x86_64)        ARCH="x86_64" ;;
+          x86_64|amd64)  ARCH="x86_64" ;;
           aarch64|arm64) ARCH="aarch64" ;;
-          *) echo "Unsupported arch: $ARCH" && exit 1 ;;
+          *) echo "::error::Unsupported arch: $ARCH"; exit 1 ;;
         esac
         BIN="tenter-${OS}-${ARCH}"
         URL="https://github.com/goweft/tenter-rs/releases/download/v${VERSION}/${BIN}"
+        DEST="${RUNNER_TEMP:-/tmp}/tenter-bin"
+        mkdir -p "$DEST"
         echo "Downloading tenter v${VERSION} for ${OS}/${ARCH}"
-        curl -fsSL "$URL" -o /usr/local/bin/tenter
-        chmod +x /usr/local/bin/tenter
-        tenter --version
+        curl -fsSL "$URL" -o "$DEST/tenter"
+        chmod +x "$DEST/tenter"
+        echo "$DEST" >> "$GITHUB_PATH"
+        "$DEST/tenter" --version
 
     - name: Run tenter scan
       id: scan
@@ -55,7 +60,11 @@ runs:
       run: |
         set +e
         FORMAT="${{ inputs.format }}"
-        if [ "$FORMAT" = "sarif" ]; then EXT="sarif"; else EXT="txt"; fi
+        case "$FORMAT" in
+          sarif) EXT="sarif" ;;
+          json)  EXT="json" ;;
+          *)     EXT="txt" ;;
+        esac
         tenter scan "${{ inputs.target }}" \
           --format "$FORMAT" \
           --fail-on "${{ inputs.fail-on }}" \
