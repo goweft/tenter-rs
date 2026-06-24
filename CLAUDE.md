@@ -9,7 +9,7 @@ No Python runtime required.
 **Repo:** github.com/goweft/tenter-rs
 **Author:** goweft (goweft@proton.me)
 **License:** MIT
-**Status:** v2.0.0 shipped, 5-platform release binaries live on GitHub Releases
+**Status:** v2.0.5 shipped, 5-platform release binaries live on GitHub Releases
 
 ## Relationship to v1
 
