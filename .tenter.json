@@ -1,7 +1,9 @@
 {
   "allowlist": [
     "target/**",
-    "tests/integration.rs"
+    "tests/integration.rs",
+    "README.md",
+    "docs/seed-sample.sh"
   ],
   "size_limit_single_file_bytes": 52428800,
   "size_limit_total_bytes": 209715200,
